@@ -13,3 +13,10 @@ __pycache__/
 *.mkv
 
 userInfo.csv
+
+test_*.py
+run_debug.bat
+
+Detect_GUI_onnx.py
+Detect_GUI_ort.py
+Detect_GUI_ultralytics_onnx.py
