@@ -1,22 +1,42 @@
-venv/
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+env/
+.env/
+
+# ONNX models
+*.onnx
+
+# Test images
+test/*.png
+test/*.jpg
+test/*.jpeg
+test/*.bmp
+
+# Test output
+test_output/
+
+# Logs
 *.log
-*.db
+*.txt
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
 
-*.pt
-*.mp4
-*.avi
-*.mov
-*.mkv
-
-userInfo.csv
-
-test_*.py
-run_debug.bat
-
-Detect_GUI_onnx.py
-Detect_GUI_ort.py
-Detect_GUI_ultralytics_onnx.py
+# Build artifacts
+*.egg-info/
+dist/
+build/
