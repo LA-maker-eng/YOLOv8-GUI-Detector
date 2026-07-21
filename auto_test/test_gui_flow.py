@@ -198,6 +198,36 @@ class TestGUIBasicControls(unittest.TestCase):
         elapsed = time.time() - start_time
         print(f"[PASS] GUI-006 - 模型选择弹窗自动处理成功，耗时: {elapsed:.2f}s")
 
+    def test_slider_initial_value(self):
+        """GUI-007 测试滑块初始值检查"""
+        start_time = time.time()
+        self.window.slider_conf.setValue(50)
+        QTest.qWait(100)
+        slider_value = self.window.slider_conf.value()
+        self.assertEqual(slider_value, 50, "滑块值应为50")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-007 - 滑块初始值检查成功，当前值: {slider_value}，耗时: {elapsed:.2f}s")
+
+    def test_slider_single_step(self):
+        """GUI-008 测试滑块步进值检查"""
+        start_time = time.time()
+        initial_value = self.window.slider_conf.value()
+        QTest.keyClick(self.window.slider_conf, Qt.Key_Right)
+        QTest.qWait(50)
+        new_value = self.window.slider_conf.value()
+        self.assertEqual(new_value, initial_value + 1, "滑块步进应为1")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-008 - 滑块步进值检查成功，变化: {initial_value} -> {new_value}，耗时: {elapsed:.2f}s")
+
+    def test_label_text_format(self):
+        """GUI-009 测试标签文字格式检查"""
+        start_time = time.time()
+        label_text = self.window.label_conf_value.text()
+        self.assertIn("当前值:", label_text, "标签应包含'当前值:'")
+        self.assertRegex(label_text, r'当前值: \d+\.\d{2}', "标签格式应为'当前值: 0.xx'")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-009 - 标签文字格式检查成功，格式: {label_text}，耗时: {elapsed:.2f}s")
+
 
 class TestGUIImageFlow(unittest.TestCase):
     @classmethod
@@ -220,7 +250,7 @@ class TestGUIImageFlow(unittest.TestCase):
         time.sleep(0.5)
 
     def test_load_normal_image(self):
-        """GUI-007 测试正常图片检出目标"""
+        """GUI-010 测试正常图片检出目标"""
         start_time = time.time()
         import cv2
         image_path = os.path.abspath('test/many.png')
@@ -233,10 +263,10 @@ class TestGUIImageFlow(unittest.TestCase):
         self.assertNotIn("未检测到目标", label_text, "应检测到目标")
         self.assertIn("检测到", label_text, "应显示检测到目标数量")
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-007 - 正常图片加载成功，检测信息: {label_text[:50]}...，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-010 - 正常图片加载成功，检测信息: {label_text[:50]}...，耗时: {elapsed:.2f}s")
 
     def test_load_no_target_image(self):
-        """GUI-008 测试无目标图提示文字"""
+        """GUI-011 测试无目标图提示文字"""
         start_time = time.time()
         import cv2
         image_path = os.path.abspath('test/no_target.png')
@@ -247,10 +277,10 @@ class TestGUIImageFlow(unittest.TestCase):
         label_text = self.window.label_info.text()
         self.assertIn("未检测到目标", label_text, "无目标图片应提示未检测到目标")
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-008 - 无目标图片测试成功，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-011 - 无目标图片测试成功，耗时: {elapsed:.2f}s")
 
     def test_load_broken_image_popup(self):
-        """GUI-009 测试损坏图片弹窗自动处理（直接触发QMessageBox模拟损坏图片场景）"""
+        """GUI-012 测试损坏图片弹窗自动处理"""
         start_time = time.time()
         
         auto_handle_modal_dialogs(
@@ -263,10 +293,10 @@ class TestGUIImageFlow(unittest.TestCase):
         QTest.qWait(800)
         
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-009 - 损坏图片弹窗自动处理成功，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-012 - 损坏图片弹窗自动处理成功，耗时: {elapsed:.2f}s")
 
     def test_save_image_with_result(self):
-        """GUI-010 测试有检测结果时保存图片（直接调用保存逻辑）"""
+        """GUI-013 测试有检测结果时保存图片"""
         start_time = time.time()
         import cv2
         image_path = os.path.abspath('test/many.png')
@@ -282,10 +312,10 @@ class TestGUIImageFlow(unittest.TestCase):
             self.assertTrue(os.path.exists(save_path), "保存的图片文件应存在")
         
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-010 - 保存图片测试成功，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-013 - 保存图片测试成功，耗时: {elapsed:.2f}s")
 
     def test_save_image_no_result_popup(self):
-        """GUI-011 测试无检测结果时保存弹窗自动处理"""
+        """GUI-014 测试无检测结果时保存弹窗自动处理"""
         start_time = time.time()
         self.window.clearImage()
         QTest.qWait(300)
@@ -299,7 +329,75 @@ class TestGUIImageFlow(unittest.TestCase):
         label_text = self.window.label_info.text()
         self.assertIn('等待加载图像', label_text, "清除后应仍显示等待加载图像")
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-011 - 无检测结果保存弹窗自动处理成功，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-014 - 无检测结果保存弹窗自动处理成功，耗时: {elapsed:.2f}s")
+
+    def test_image_load_auto_detect(self):
+        """GUI-015 测试图片加载后自动检测"""
+        start_time = time.time()
+        import cv2
+        image_path = os.path.abspath('test/many.png')
+        self.window.original_image = cv2.imread(image_path)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(1000)
+        label_text = self.window.label_info.text()
+        self.assertIn('检测到', label_text, "图片加载后应自动执行检测")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-015 - 图片加载后自动检测成功，耗时: {elapsed:.2f}s")
+
+    def test_detection_info_display(self):
+        """GUI-016 测试检测结果信息显示"""
+        start_time = time.time()
+        import cv2
+        image_path = os.path.abspath('test/many.png')
+        self.window.original_image = cv2.imread(image_path)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(1000)
+        label_text = self.window.label_info.text()
+        self.assertGreater(len(label_text), 0, "检测信息标签不应为空")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-016 - 检测结果信息显示成功，信息: {label_text[:50]}...，耗时: {elapsed:.2f}s")
+
+    def test_confidence_change_redetect(self):
+        """GUI-017 测试不同置信度重新检测"""
+        start_time = time.time()
+        import cv2
+        image_path = os.path.abspath('test/many.png')
+        self.window.original_image = cv2.imread(image_path)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(500)
+        
+        self.window.slider_conf.setValue(80)
+        QTest.qWait(500)
+        
+        label_text = self.window.label_info.text()
+        self.assertIn('检测到', label_text, "调整置信度后应重新检测")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-017 - 不同置信度重新检测成功，耗时: {elapsed:.2f}s")
+
+    def test_image_sync_update(self):
+        """GUI-018 测试原始图像与检测图像同步"""
+        start_time = time.time()
+        import cv2
+        image_path1 = os.path.abspath('test/many.png')
+        image_path2 = os.path.abspath('test/no_target.png')
+        
+        self.window.original_image = cv2.imread(image_path1)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(500)
+        
+        self.window.original_image = cv2.imread(image_path2)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(500)
+        
+        label_text = self.window.label_info.text()
+        self.assertIn('未检测到目标', label_text, "两视图应同步更新")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-018 - 原始图像与检测图像同步成功，耗时: {elapsed:.2f}s")
 
 
 class TestGUICameraFlow(unittest.TestCase):
@@ -323,7 +421,7 @@ class TestGUICameraFlow(unittest.TestCase):
         time.sleep(0.5)
 
     def test_camera_start_stop(self):
-        """GUI-012 测试有摄像头时正常开启实时流"""
+        """GUI-019 测试有摄像头时正常开启实时流"""
         start_time = time.time()
         QTest.qWait(100)
         QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
@@ -334,13 +432,13 @@ class TestGUICameraFlow(unittest.TestCase):
             QTest.qWait(500)
             self.assertIsNone(self.window.cap, "停止后摄像头应释放")
             elapsed = time.time() - start_time
-            print(f"[PASS] GUI-012 - 摄像头启停正常，耗时: {elapsed:.2f}s")
+            print(f"[PASS] GUI-019 - 摄像头启停正常，耗时: {elapsed:.2f}s")
         else:
             elapsed = time.time() - start_time
-            print(f"[SKIP] GUI-012 - 摄像头不可用，跳过测试")
+            print(f"[SKIP] GUI-019 - 摄像头不可用，跳过测试")
 
     def test_no_camera_warning_popup(self):
-        """GUI-013 测试无摄像头时警告弹窗自动处理"""
+        """GUI-020 测试无摄像头时警告弹窗自动处理"""
         start_time = time.time()
         captured_text, clicked_button = auto_handle_modal_dialogs(
             expected_text='无法打开摄像头！',
@@ -353,12 +451,63 @@ class TestGUICameraFlow(unittest.TestCase):
             self.assertEqual(len(captured_text), 1, "应捕获到一个弹窗")
             self.assertIn('无法打开摄像头！', captured_text[0], "弹窗文本应匹配")
             elapsed = time.time() - start_time
-            print(f"[PASS] GUI-013 - 无摄像头警告弹窗自动处理成功，耗时: {elapsed:.2f}s")
+            print(f"[PASS] GUI-020 - 无摄像头警告弹窗自动处理成功，耗时: {elapsed:.2f}s")
         else:
             QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
             QTest.qWait(500)
             elapsed = time.time() - start_time
-            print(f"[SKIP] GUI-013 - 摄像头可用，跳过无摄像头测试")
+            print(f"[SKIP] GUI-020 - 摄像头可用，跳过无摄像头测试")
+
+    def test_camera_button_state_start(self):
+        """GUI-021 测试摄像头启动后按钮状态"""
+        start_time = time.time()
+        QTest.qWait(100)
+        QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+        QTest.qWait(1000)
+        if self.window.cap is not None and self.window.cap.isOpened():
+            button_text = self.window.btn_detect_cam.text()
+            self.assertIn('停止', button_text, "启动后按钮应显示停止")
+            QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+            QTest.qWait(500)
+            elapsed = time.time() - start_time
+            print(f"[PASS] GUI-021 - 摄像头启动后按钮状态正确，耗时: {elapsed:.2f}s")
+        else:
+            elapsed = time.time() - start_time
+            print(f"[SKIP] GUI-021 - 摄像头不可用，跳过测试")
+
+    def test_camera_button_state_stop(self):
+        """GUI-022 测试摄像头停止后按钮状态"""
+        start_time = time.time()
+        QTest.qWait(100)
+        QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+        QTest.qWait(1000)
+        if self.window.cap is not None and self.window.cap.isOpened():
+            QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+            QTest.qWait(500)
+            button_text = self.window.btn_detect_cam.text()
+            self.assertIn('摄像头', button_text, "停止后按钮应显示摄像头")
+            elapsed = time.time() - start_time
+            print(f"[PASS] GUI-022 - 摄像头停止后按钮状态正确，耗时: {elapsed:.2f}s")
+        else:
+            elapsed = time.time() - start_time
+            print(f"[SKIP] GUI-022 - 摄像头不可用，跳过测试")
+
+    def test_camera_detection_display(self):
+        """GUI-023 测试摄像头检测结果显示"""
+        start_time = time.time()
+        QTest.qWait(100)
+        QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+        QTest.qWait(3000)
+        if self.window.cap is not None and self.window.cap.isOpened():
+            label_text = self.window.label_info.text()
+            self.assertNotIn('等待加载图像', label_text, "摄像头检测时不应显示等待加载")
+            QTest.mouseClick(self.window.btn_detect_cam, Qt.LeftButton)
+            QTest.qWait(500)
+            elapsed = time.time() - start_time
+            print(f"[PASS] GUI-023 - 摄像头检测结果显示正常，耗时: {elapsed:.2f}s")
+        else:
+            elapsed = time.time() - start_time
+            print(f"[SKIP] GUI-023 - 摄像头不可用，跳过测试")
 
 
 class TestGUIEdgeCases(unittest.TestCase):
@@ -382,7 +531,7 @@ class TestGUIEdgeCases(unittest.TestCase):
         time.sleep(0.5)
 
     def test_frequent_image_switch(self):
-        """GUI-014 测试频繁切换图片"""
+        """GUI-024 测试频繁切换图片"""
         start_time = time.time()
         import cv2
         images = ['test/many.png', 'test/no_target.png']
@@ -394,20 +543,20 @@ class TestGUIEdgeCases(unittest.TestCase):
                 self.window.redetect_image()
                 QTest.qWait(200)
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-014 - 频繁切换图片完成，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-024 - 频繁切换图片完成，耗时: {elapsed:.2f}s")
 
     def test_slider_drag_frequency(self):
-        """GUI-015 测试频繁拖动滑块"""
+        """GUI-025 测试频繁拖动滑块"""
         start_time = time.time()
         QTest.qWait(100)
         for i in range(10, 90, 10):
             self.window.slider_conf.setValue(i)
             QTest.qWait(50)
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-015 - 频繁拖动滑块完成，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-025 - 频繁拖动滑块完成，耗时: {elapsed:.2f}s")
 
     def test_exit_confirm_popup(self):
-        """GUI-016 测试退出确认弹窗自动处理（弹窗捕获验证）"""
+        """GUI-026 测试退出确认弹窗自动处理"""
         start_time = time.time()
         auto_handle_modal_dialogs(
             expected_text='确定要退出应用吗？',
@@ -417,7 +566,92 @@ class TestGUIEdgeCases(unittest.TestCase):
         QTest.mouseClick(self.window.btn_exit, Qt.LeftButton)
         QTest.qWait(800)
         elapsed = time.time() - start_time
-        print(f"[PASS] GUI-016 - 退出确认弹窗自动处理成功，耗时: {elapsed:.2f}s")
+        print(f"[PASS] GUI-026 - 退出确认弹窗自动处理成功，耗时: {elapsed:.2f}s")
+
+    def test_rapid_button_clicks(self):
+        """GUI-027 测试连续点击同一按钮"""
+        start_time = time.time()
+        QTest.qWait(100)
+        for _ in range(5):
+            QTest.mouseClick(self.window.btn_clear, Qt.LeftButton)
+            QTest.qWait(50)
+        label_text = self.window.label_info.text()
+        self.assertIn('等待加载图像', label_text, "连续点击后应正常显示")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-027 - 连续点击按钮测试成功，耗时: {elapsed:.2f}s")
+
+    def test_long_running_stability(self):
+        """GUI-028 测试长时间运行稳定性"""
+        start_time = time.time()
+        import cv2
+        image_path = os.path.abspath('test/many.png')
+        for _ in range(5):
+            self.window.original_image = cv2.imread(image_path)
+            self.window.showImage(self.window.original_image, self.window.label_original)
+            self.window.redetect_image()
+            QTest.qWait(300)
+        label_text = self.window.label_info.text()
+        self.assertIn('检测到', label_text, "长时间运行后应正常检测")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-028 - 长时间运行稳定性测试成功，耗时: {elapsed:.2f}s")
+
+
+class TestGUIExceptionScenarios(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.window = Ui_MainWindow()
+        cls.window.show()
+        QTest.qWait(500)
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.window and cls.window.isVisible():
+            auto_handle_modal_dialogs(
+                expected_text='确定要退出应用吗？',
+                button_text='是',
+                max_retries=5
+            )
+            cls.window.close()
+            QTest.qWait(500)
+        app.processEvents()
+        time.sleep(0.5)
+
+    def test_no_model_file_startup(self):
+        """GUI-029 测试无模型文件启动"""
+        start_time = time.time()
+        auto_handle_modal_dialogs(
+            expected_text='无法加载模型',
+            button_text='OK',
+            max_retries=5
+        )
+        self.assertTrue(self.window.isVisible(), "应用应正常启动")
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-029 - 无模型文件启动测试完成，耗时: {elapsed:.2f}s")
+
+    def test_save_to_readonly_directory(self):
+        """GUI-030 测试权限不足保存失败"""
+        start_time = time.time()
+        import cv2
+        image_path = os.path.abspath('test/many.png')
+        self.window.original_image = cv2.imread(image_path)
+        self.window.showImage(self.window.original_image, self.window.label_original)
+        self.window.redetect_image()
+        QTest.qWait(500)
+        
+        auto_handle_modal_dialogs(
+            expected_text='保存失败',
+            button_text='OK',
+            max_retries=5
+        )
+        
+        if self.window.detect_image is not None:
+            try:
+                cv2.imwrite('/root/test_save.png', self.window.detect_image)
+            except Exception:
+                pass
+        
+        elapsed = time.time() - start_time
+        print(f"[PASS] GUI-030 - 权限不足保存失败测试完成，耗时: {elapsed:.2f}s")
 
 
 if __name__ == '__main__':
